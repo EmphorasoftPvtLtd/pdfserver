@@ -1,24 +1,25 @@
 import express from "express";
-import crypto from "crypto";
+import fetch from "node-fetch";
+import bodyParser from "body-parser";
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
+// ✅ API route
 app.post("/fetch-pdf", async (req, res) => {
   try {
     const { url, headers } = req.body;
     const response = await fetch(url, { headers });
-    if (!response.ok) {
-      return res.status(response.status).json({ error: "Failed to fetch PDF" });
-    }
+    const buffer = await response.arrayBuffer();
 
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-
-    res.json({ base64 });
+    // Send back Base64
+    const base64Data = Buffer.from(buffer).toString("base64");
+    res.json({ base64: base64Data });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(3000, () => console.log("✅ Proxy running on port 3000"));
+// ✅ For Vercel: export handler
+export default app;
