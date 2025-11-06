@@ -1,6 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/fetch-pdf.js", "use": "@vercel/node" }
+    {
+      "src": "api/fetch-pdf.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
   ]
 }
