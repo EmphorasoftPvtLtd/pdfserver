@@ -7,13 +7,16 @@ export default async function handler(req, res) {
 
   try {
     const { url, headers } = req.body;
+    if (!url) {
+      return res.status(400).json({ error: "Missing 'url' in request body" });
+    }
+
     const response = await fetch(url, { headers });
     const buffer = await response.arrayBuffer();
-
     const base64Data = Buffer.from(buffer).toString("base64");
+
     res.status(200).json({ base64: base64Data });
   } catch (err) {
-    console.error("Error:", err);
     res.status(500).json({ error: err.message });
   }
 }
