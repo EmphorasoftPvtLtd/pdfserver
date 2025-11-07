@@ -3,6 +3,32 @@
 export default async function handler(req, res) {
   try {
     // ✅ 1. Webhook verification challenge (Adobe sends GET first)
+      console.log("req", req);
+      console.log("res", res);
+      if (res.agreement["status"] === "SIGNED") {
+      
+      const eventBody = res.agreement;
+      console.log("✅ Adobe Webhook Event Received:", eventBody);
+
+      // Replace this with your Suitelet deployment URL
+      const netsuiteSuiteletUrl =
+        "https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=1&compid=5001454_SB2&ns-at=AAEJ7tMQ3iJxCDUnFRa2Mj94TIxNYeOvy3y4P5FLVm87leMkmtY";
+
+      // Forward to your Suitelet as JSON
+      const suiteletResponse = await fetch(netsuiteSuiteletUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(eventBody),
+      });
+
+      const nsText = await suiteletResponse.text();
+      console.log("🔁 Forwarded to Suitelet. Response:", nsText);
+
+      return res.status(200).json({ forwarded: true, nsResponse: nsText });
+    }
+    // ✅ 1. Webhook verification challenge (Adobe sends GET first)
     if (req.method === "GET") {
       const challenge = req.query.challenge;
       const adobeClientId = req.headers["x-adobesign-clientid"];
