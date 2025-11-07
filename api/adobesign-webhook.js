@@ -5,9 +5,9 @@ export default async function handler(req, res) {
     // ✅ 1. Webhook verification challenge (Adobe sends GET first)
       console.log("req", req);
       console.log("res", res);
-      if (res.agreement["status"] === "SIGNED") {
+      if (res.AdobeWebhookEventReceived.agreement.status === "SIGNED") {
       
-      const eventBody = res.agreement;
+      const eventBody = res.AdobeWebhookEventReceived.agreement;
       console.log("✅ Adobe Webhook Event Received:", eventBody);
 
       // Replace this with your Suitelet deployment URL
@@ -84,3 +84,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
