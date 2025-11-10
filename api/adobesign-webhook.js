@@ -10,6 +10,8 @@ export default async function handler(req, res) {
       
       const eventBody = res;
       console.log("✅ Adobe Webhook Event Received: open", resJ );
+      console.log("✅ Adobe Webhook Event Received: open1", req );
+      console.log("✅ Adobe Webhook Event Received: open2", res );
 
       // Replace this with your Suitelet deployment URL
       const netsuiteSuiteletUrl =
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: resJ,//JSON.stringify(eventBody),
+        //body: resJ,//JSON.stringify(eventBody),
       });
 
       const nsText = await suiteletResponse.text();
@@ -85,6 +87,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
