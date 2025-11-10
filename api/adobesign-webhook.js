@@ -38,7 +38,3 @@ export default async function handler(req, res) {
 }
 }
 
-  // Default if not GET/POST
-  res.status(405).json({ error: "Method not allowed" });
-}
-
