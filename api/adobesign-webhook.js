@@ -21,21 +21,24 @@ export default async function handler(req, res) {
 
       // Forward the body to NetSuite Suitelet
       const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=1&compid=5001454_SB2&ns-at=AAEJ7tMQ3iJxCDUnFRa2Mj94TIxNYeOvy3y4P5FLVm87leMkmtY", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(req.body),
-      });
+       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body)
+    });
 
-      const nsText = await nsResponse.text();
-      console.log("Response from NetSuite:", nsText);
+    const nsText = await nsResponse.text();
+    console.log("Response from NetSuite:", nsText);
 
-      return res.status(200).json({ success: true });
-    } catch (err) {
-      console.error("Error handling webhook:", err);
-      return res.status(500).json({ error: err.message });
-    }
+    res.status(200).json({ success: true, nsResponse: nsText });
+  } catch (error) {
+    console.error("Error forwarding to NetSuite:", error);
+    res.status(500).json({ success: false, error: error.message });
   }
+  return;
+}
+}
 
   // Default if not GET/POST
   res.status(405).json({ error: "Method not allowed" });
 }
+
