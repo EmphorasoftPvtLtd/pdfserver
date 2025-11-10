@@ -9,7 +9,7 @@ export default async function handler(req, res) {
      // if (resJ.agreement.status === "SIGNED") {
       
       const eventBody = res;
-      console.log("✅ Adobe Webhook Event Received:", resJ );
+      console.log("✅ Adobe Webhook Event Received: open", resJ );
 
       // Replace this with your Suitelet deployment URL
       const netsuiteSuiteletUrl =
@@ -21,11 +21,11 @@ export default async function handler(req, res) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: eventBody,//JSON.stringify(eventBody),
+        body: resJ,//JSON.stringify(eventBody),
       });
 
       const nsText = await suiteletResponse.text();
-      console.log("🔁 Forwarded to Suitelet. Response:", nsText);
+      console.log("🔁 Forwarded to Suitelet. Response: open", nsText);
 
       return res.status(200).json({ forwarded: true, nsResponse: nsText });
     //}
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     // ✅ 2. Webhook event POST payload
     if (req.method === "POST") {
       const eventBody = req.body;
-      console.log("✅ Adobe Webhook Event Received:", eventBody);
+      console.log("✅ Adobe Webhook Event Received: post", eventBody);
 
       // Replace this with your Suitelet deployment URL
       const netsuiteSuiteletUrl =
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       });
 
       const nsText = await suiteletResponse.text();
-      console.log("🔁 Forwarded to Suitelet. Response:", nsText);
+      console.log("🔁 Forwarded to Suitelet. Response:post", nsText);
 
       return res.status(200).json({ forwarded: true, nsResponse: nsText });
     }
@@ -85,6 +85,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
