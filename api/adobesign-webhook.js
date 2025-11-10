@@ -9,7 +9,7 @@ export default async function handler(req, res) {
      // if (resJ.agreement.status === "SIGNED") {
       
       const eventBody = res;
-      console.log("✅ Adobe Webhook Event Received:", eventBody);
+      console.log("✅ Adobe Webhook Event Received:", resJ );
 
       // Replace this with your Suitelet deployment URL
       const netsuiteSuiteletUrl =
@@ -85,6 +85,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
