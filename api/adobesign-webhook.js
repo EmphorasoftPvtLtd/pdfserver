@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(eventBody),
+        body: eventBody,//JSON.stringify(eventBody),
       });
 
       const nsText = await suiteletResponse.text();
@@ -85,6 +85,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
