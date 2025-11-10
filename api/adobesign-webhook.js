@@ -4,8 +4,8 @@ export default async function handler(req, res) {
   try {
     // ✅ 1. Webhook verification challenge (Adobe sends GET first)
     const resJ = JSON.stringify(res.body)
-      console.log("req", req);
-      console.log("res", res);
+      //console.log("req", req);
+     // console.log("res", res);
      // if (resJ.agreement.status === "SIGNED") {
       
       const eventBody = res;
@@ -85,6 +85,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 
 
