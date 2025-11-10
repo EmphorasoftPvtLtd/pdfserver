@@ -1,101 +1,41 @@
 // api/adobesign-webhook.js
-
 export default async function handler(req, res) {
-  try {
-    // ✅ 1. Webhook verification challenge (Adobe sends GET first)
   console.log("Adobe Webhook: Received", req.method);
-    const resJ = JSON.stringify(res.body)
-      //console.log("req", req);
-     // console.log("res", res);
-     // if (resJ.agreement.status === "SIGNED") {
-      
-      const eventBody = res;
-      console.log("✅ Adobe Webhook Event Received: open", resJ );
-      console.log("✅ Adobe Webhook Event Received: open1", req );
-      console.log("✅ Adobe Webhook Event Received: open2", res );
 
-      // Replace this with your Suitelet deployment URL
-      const netsuiteSuiteletUrl =
-        "https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=1&compid=5001454_SB2&ns-at=AAEJ7tMQ3iJxCDUnFRa2Mj94TIxNYeOvy3y4P5FLVm87leMkmtY";
+  if (req.method === "GET") {
+    const clientId = req.headers["x-adobesign-clientid"];
+    console.log("Verification request received. Client ID:", clientId);
 
-      // Forward to your Suitelet as JSON
-      const suiteletResponse = await fetch(netsuiteSuiteletUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        //body: resJ,//JSON.stringify(eventBody),
-      });
-
-      const nsText = await suiteletResponse.text();
-      console.log("🔁 Forwarded to Suitelet. Response: open", nsText);
-
-      return res.status(200).json({ forwarded: true, nsResponse: nsText });
-    //}
-    // ✅ 1. Webhook verification challenge (Adobe sends GET first)
-    if (req.method === "GET") {
-      const challenge = req.query.challenge;
-      const adobeClientId = req.headers["x-adobesign-clientid"];
-
-      console.log("🔹 Verification Request Received");
-      console.log("Client ID:", adobeClientId);
-      console.log("Challenge:", challenge);
-
-      if (challenge) {
-        // Echo the challenge string as per Adobe's spec
-        return res.status(200).send(challenge);
-      }
-
-      // Suitelet expects a header echo — optionally forward this
-      if (adobeClientId) {
-        return res
-          .setHeader("X-AdobeSign-ClientId", adobeClientId)
-          .status(200)
-          .send("Webhook Verified");
-      }
-
-      return res.status(400).send("Missing verification data");
+    if (clientId) {
+      res.setHeader("X-AdobeSign-ClientId", clientId);
+      return res.status(200).send("Webhook Verified");
+    } else {
+      return res.status(400).send("Missing X-AdobeSign-ClientId header");
     }
-
-    // ✅ 2. Webhook event POST payload
-    if (req.method === "POST") {
-      const eventBody = req.body;
-      console.log("✅ Adobe Webhook Event Received: post", eventBody);
-
-      // Replace this with your Suitelet deployment URL
-      const netsuiteSuiteletUrl =
-        "https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=1&compid=5001454_SB2&ns-at=AAEJ7tMQ3iJxCDUnFRa2Mj94TIxNYeOvy3y4P5FLVm87leMkmtY";
-
-      // Forward to your Suitelet as JSON
-      const suiteletResponse = await fetch(netsuiteSuiteletUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(eventBody),
-      });
-
-      const nsText = await suiteletResponse.text();
-      console.log("🔁 Forwarded to Suitelet. Response:post", nsText);
-
-      return res.status(200).json({ forwarded: true, nsResponse: nsText });
-    }
-
-    // ❌ Invalid HTTP method
-    res.status(405).json({ error: "Method not allowed" });
-  } catch (error) {
-    console.error("❌ Webhook Error:", error);
-    res.status(500).json({ error: error.message });
   }
+
+  if (req.method === "POST") {
+    try {
+      console.log("Webhook event received from Adobe:");
+      console.log(JSON.stringify(req.body, null, 2));
+
+      // Forward the body to NetSuite Suitelet
+      const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=1&compid=5001454_SB2&ns-at=AAEJ7tMQ3iJxCDUnFRa2Mj94TIxNYeOvy3y4P5FLVm87leMkmtY", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req.body),
+      });
+
+      const nsText = await nsResponse.text();
+      console.log("Response from NetSuite:", nsText);
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Error handling webhook:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // Default if not GET/POST
+  res.status(405).json({ error: "Method not allowed" });
 }
-
-
-
-
-
-
-
-
-
-
-
