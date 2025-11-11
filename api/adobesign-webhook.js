@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=2&compid=5001454_SB2&ns-at=AAEJ7tMQijh8mRK-rUkhYwtPylnfziNimAxT_ppcMn1DDVVO0UM", {
        method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: {},
+      body: JSON.stringify(req.body, null, 2),
     });
 
     const nsText = await nsResponse.text();
@@ -37,6 +37,7 @@ export default async function handler(req, res) {
   return;
 }
 }
+
 
 
 
