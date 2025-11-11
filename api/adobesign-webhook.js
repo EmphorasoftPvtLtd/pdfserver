@@ -1,49 +1,27 @@
-// api/adobesign-webhook.js
 export default async function handler(req, res) {
-  console.log("Adobe Webhook: Received", req.method);
+  try {
+    const netsuiteUrl = "https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4&compid=5001454_SB2";
 
-  if (req.method === "GET") {
-    const clientId = req.headers["x-adobesign-clientid"];
-    console.log("Verification request received. Client ID:", clientId);
-
-    if (clientId) {
-      res.setHeader("X-AdobeSign-ClientId", clientId);
-      return res.status(200).send("Webhook Verified");
-    } else {
-      return res.status(400).send("Missing X-AdobeSign-ClientId header");
-    }
-  }
-
-  if (req.method === "POST") {
-    try {
-      console.log("Webhook event received from Adobe:");
-      console.log(JSON.stringify(req.body, null, 2));
-
-      // Forward the body to NetSuite Suitelet
-      const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4&compid=5001454_SB2", {
-       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body, null, 2),
+    const response = await fetch(netsuiteUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-webhook-secret": "abc123" // same secret as in Suitelet
+      },
+      body: JSON.stringify({
+        testFrom: "Vercel",
+        timestamp: new Date().toISOString()
+      })
     });
 
-    const nsText = await nsResponse.text();
-    console.log("Response from NetSuite:", nsText);
+    const text = await response.text();
 
-    res.status(200).json({ success: true, nsResponse: nsText });
+    res.status(200).send({
+      status: response.status,
+      netsuiteResponse: text
+    });
   } catch (error) {
-    console.error("Error forwarding to NetSuite:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Error posting to NetSuite:", error);
+    res.status(500).send({ error: error.message });
   }
-  return;
 }
-}
-
-
-
-
-
-
-
-
-
-
