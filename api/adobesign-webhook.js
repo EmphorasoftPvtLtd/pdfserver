@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       console.log(JSON.stringify(req.body, null, 2));
 
       // Forward the body to NetSuite Suitelet
-      const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4&compid=5001454_SB2&ns-at=AAEJ7tMQzUnoz2oTgxfLpp_NftaExIWcFuExC-dnrnijZCSHVnA", {
+      const nsResponse = await fetch("https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4&compid=5001454_SB2", {
        method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body, null, 2),
@@ -37,6 +37,7 @@ export default async function handler(req, res) {
   return;
 }
 }
+
 
 
 
