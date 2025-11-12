@@ -1,23 +1,24 @@
+import crypto from "crypto";
+import oauth1a from "oauth-1.0a";
 import axios from "axios";
 
-export default async function handler(req, res) {
-  try {
-    console.log("Webhook received:", req.body);
+const oauth = oauth1a({
+  consumer: { key: "CONSUMER_KEY", secret: "CONSUMER_SECRET" },
+  signature_method: "HMAC-SHA256",
+  hash_function(baseString, key) {
+    return crypto.createHmac("sha256", key).update(baseString).digest("base64");
+  },
+});
 
-    // Forward to NetSuite (use internal domain)
-    const netsuiteUrl = "https://5001454-sb2.app.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4";
+const request_data = {
+  url: "https://5001454-sb2.app.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4",
+  method: "POST",
+  data: { hello: "world" },
+};
 
-    // Optional: add auth headers if required
-    const response = await axios.post(netsuiteUrl, req.body, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "NLAuth nlauth_account=5001454_SB2, nlauth_email=rajasekhar.patakota@emphorasoft.com, nlauth_signature=NSP.raja@526, nlauth_role=3"
-      }
-    });
+const token = { key: "TOKEN_ID", secret: "TOKEN_SECRET" };
 
-    res.status(200).json({ status: "Forwarded to NetSuite", netsuiteResponse: response.data });
-  } catch (error) {
-    console.error("Error forwarding:", error);
-    res.status(500).json({ error: error.message });
-  }
-}
+const headers = oauth.toHeader(oauth.authorize(request_data, token));
+headers["Content-Type"] = "application/json";
+
+await axios.post(request_data.url, request_data.data, { headers });
