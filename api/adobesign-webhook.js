@@ -1,29 +1,23 @@
+import axios from "axios";
+
 export default async function handler(req, res) {
   try {
-    const netsuiteUrl = "https://5001454-sb2.extforms.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=5&compid=5001454_SB2&ns-at=AAEJ7tMQTNPk-V_NBbVpqKan7vSOLaOg9aX5yMJu9v45XlCLJjs";
+    console.log("Webhook received:", req.body);
 
-    const response = await fetch(netsuiteUrl, {
-      method: "POST",
+    // Forward to NetSuite (use internal domain)
+    const netsuiteUrl = "https://5001454-sb2.app.netsuite.com/app/site/hosting/scriptlet.nl?script=3490&deploy=4";
+
+    // Optional: add auth headers if required
+    const response = await axios.post(netsuiteUrl, req.body, {
       headers: {
         "Content-Type": "application/json",
-        //"x-webhook-secret": "abc123" // same secret as in Suitelet
-      },
-      body: JSON.stringify({
-        testFrom: "Vercel",
-        timestamp: new Date().toISOString()
-      })
+        "Authorization": "NLAuth nlauth_account=5001454_SB2, nlauth_email=rajasekhar.patakota@emphorasoft.com, nlauth_signature=NSP.raja@526, nlauth_role=3"
+      }
     });
 
-    const text = await response.text();
-
-    res.status(200).send({
-      status: response.status,
-      netsuiteResponse: text
-    });
+    res.status(200).json({ status: "Forwarded to NetSuite", netsuiteResponse: response.data });
   } catch (error) {
-    console.error("Error posting to NetSuite:", error);
-    res.status(500).send({ error: error.message });
+    console.error("Error forwarding:", error);
+    res.status(500).json({ error: error.message });
   }
 }
-
-
