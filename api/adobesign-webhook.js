@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-webhook-secret": "abc123" // same secret as in Suitelet
+        //"x-webhook-secret": "abc123" // same secret as in Suitelet
       },
       body: JSON.stringify({
         testFrom: "Vercel",
@@ -25,4 +25,5 @@ export default async function handler(req, res) {
     res.status(500).send({ error: error.message });
   }
 }
+
 
